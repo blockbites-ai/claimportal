@@ -23,7 +23,7 @@ interface RegistrationStepperProps {
 export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [codeSent, setCodeSent] = useState(false);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
@@ -50,7 +50,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         const { error } = await supabase.auth.signInWithOtp({
           email: data.email,
           options: {
-            emailRedirectTo: window.location.origin,
+            shouldCreateUser: true,
           },
         });
 
@@ -63,15 +63,29 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           return;
         }
 
-        setEmailSent(true);
+        setCodeSent(true);
         toast({
           title: "Success",
-          description: "Verification link sent to your email",
+          description: "Verification code sent to your email",
         });
       }
 
-      if (currentStep === 4) {
-        // Skip verification code step since we're using magic links
+      if (currentStep === 4 && data.verificationCode) {
+        const { error } = await supabase.auth.verifyOtp({
+          email: data.email!,
+          token: data.verificationCode,
+          type: 'email',
+        });
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: "Invalid verification code",
+            variant: "destructive",
+          });
+          return;
+        }
+
         onComplete(data as RegistrationState);
         return;
       }
@@ -124,15 +138,46 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         );
       case 4:
         return (
-          <div className="space-y-4 text-center">
-            <CheckCircle2 className="w-16 h-16 mx-auto text-primary" />
-            <h3 className="text-lg font-semibold">Check Your Email</h3>
+          <div className="space-y-4">
+            <Label htmlFor="verificationCode">Verification Code</Label>
+            <Input
+              id="verificationCode"
+              placeholder="Enter the code from your email"
+              maxLength={6}
+              {...form.register("verificationCode")}
+            />
             <p className="text-sm text-muted-foreground">
-              We've sent a verification link to your email address. Please click the link to complete your registration.
+              Please enter the verification code sent to {form.getValues("email")}
             </p>
-            <p className="text-sm">
-              {form.getValues("email")}
-            </p>
+            <Button
+              variant="link"
+              className="px-0"
+              onClick={async () => {
+                if (!form.getValues("email")) return;
+                setIsLoading(true);
+                const { error } = await supabase.auth.signInWithOtp({
+                  email: form.getValues("email"),
+                  options: {
+                    shouldCreateUser: true,
+                  },
+                });
+                setIsLoading(false);
+                if (error) {
+                  toast({
+                    title: "Error",
+                    description: error.message,
+                    variant: "destructive",
+                  });
+                } else {
+                  toast({
+                    title: "Success",
+                    description: "New verification code sent",
+                  });
+                }
+              }}
+            >
+              Resend code
+            </Button>
           </div>
         );
       default:
