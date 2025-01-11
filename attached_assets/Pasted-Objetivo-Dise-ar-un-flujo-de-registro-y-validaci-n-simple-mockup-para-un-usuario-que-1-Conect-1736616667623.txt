@@ -1,0 +1,41 @@
+Objetivo: Diseñar un flujo de registro y validación simple (mockup) para un usuario que:
+		1.	Conecta su wallet (paso simulado).
+	2.	Se valida si es NFT holder (siempre true en este mockup).
+	3.	Proporciona su correo electrónico.
+	4.	Se valida el correo (simulado).
+	5.	Accede a un dashboard que muestra información de su cuenta.
+
+	Puntos clave a incluir en el prototipo:
+		•	Un Stepper o asistente con 4 pasos:
+	1.	Conectar Wallet
+	•	Campo para ingresar (o simular) el ID de la wallet.
+	•	Incluir un botón “Conectar” que pasa al siguiente paso.
+	2.	Validar Holder
+	•	Mostrar mensaje de “Validación de Holder en proceso…”
+	•	Asumir resultado positivo y permitir ir al siguiente paso.
+	3.	Ingresar Email
+	•	Campo para ingresar correo electrónico.
+	•	Botón “Continuar” para pasar a la validación.
+	4.	Validar Token de Correo
+	•	Simular un código de validación (no se implementa en esta versión).
+	•	Al hacer clic en “Validar”, pasar al dashboard final.
+	•	Pantalla de Dashboard (una sola vista) con la siguiente información:
+	•	Nombre de usuario (campo de muestra, puede ser “User Name Example”).
+	•	Wallet ID (usar el valor que el usuario ingresó en el paso 1).
+	•	Rachas cumplidas (mostrar un número cualquiera, ej. “3”).
+	•	Elegibilidad (mostrar un estado booleano o texto “Elegible / No Elegible”).
+	•	Botón de Claim (desactivado si no es elegible o si ya ha reclamado, activo en caso contrario).
+	•	Balance disponible (mostrar un número, ej. “50 tokens”).
+	•	Contador para el próximo claim (ej. “Faltan 2 días para tu próximo Claim”).
+	•	Estilo:
+	•	Utilizar un diseño minimalista, con componentes de Stepper (o un wizard) arriba o a la izquierda, y contenido principal en el panel derecho o al centro.
+	•	Usar texto e íconos simples para mockups (no se requiere UI final).
+
+	Resultado esperado:
+Un prototipo de baja fidelidad que me permita navegar paso a paso:
+		•	Paso 1 (Wallet) → Paso 2 (Validar Holder) → Paso 3 (Email) → Paso 4 (Validar Email) → Dashboard.
+
+	Notas adicionales:
+		•	En este momento, las validaciones de wallet y de email deben verse únicamente como pasos simulados (mock).
+	•	Esto se ampliará en futuras iteraciones para conectarse realmente a la blockchain y a un servicio de verificación de correo.
+	•	Se puede incluir un “Pantalla de Error” sencilla si se ingresa un token de validación falso, pero no es obligatorio en la primera versión.
