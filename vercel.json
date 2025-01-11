@@ -4,6 +4,11 @@
   "installCommand": "npm install",
   "framework": "vite",
   "outputDirectory": "dist/public",
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
   "functions": {
     "api/**/*": {
       "memory": 1024,
@@ -19,5 +24,9 @@
       "source": "/(.*)",
       "destination": "/"
     }
-  ]
+  ],
+  "env": {
+    "VITE_SUPABASE_URL": "REQUIRED",
+    "VITE_SUPABASE_ANON_KEY": "REQUIRED"
+  }
 }
