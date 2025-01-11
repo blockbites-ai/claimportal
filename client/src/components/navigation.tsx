@@ -40,7 +40,7 @@ export function Navigation({
                   "cursor-default text-lg font-semibold text-[#263238]",
                 )}
               >
-                <img src={BlockbitesLogo} alt="Blockbites" className="h-7" />
+                <img src={BlockbitesLogo} alt="Blockbites" className="h-5" />
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
