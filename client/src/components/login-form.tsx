@@ -103,7 +103,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
 
   if (isResetting) {
     return (
-      <Card className="w-full max-w-md mx-auto bg-[#F8BB33]">
+      <Card className="w-full max-w-md mx-auto bg-white">
         <CardContent className="pt-6">
           <h3 className="text-lg font-semibold mb-4 text-[#263238]">Reset Password</h3>
           <div className="space-y-4">
@@ -113,7 +113,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="mt-1 bg-white"
+                className="mt-1"
                 {...form.register("email")}
               />
             </div>
@@ -128,7 +128,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full bg-white hover:bg-white/90"
+                className="w-full border-[#263238] text-[#263238] hover:bg-[#263238]/10"
                 onClick={() => setIsResetting(false)}
                 disabled={isLoading}
               >
@@ -142,7 +142,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-[#F8BB33]">
+    <Card className="w-full max-w-md mx-auto bg-white">
       <CardContent className="pt-6">
         <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
           <div>
@@ -151,7 +151,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
               id="email"
               type="email"
               placeholder="Enter your email"
-              className="mt-1 bg-white"
+              className="mt-1"
               {...form.register("email")}
             />
           </div>
@@ -161,7 +161,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
               id="password"
               type="password"
               placeholder="Enter your password"
-              className="mt-1 bg-white"
+              className="mt-1"
               {...form.register("password")}
             />
           </div>
@@ -184,7 +184,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full bg-white hover:bg-white/90"
+              className="w-full border-[#263238] text-[#263238] hover:bg-[#263238]/10"
               onClick={onRegister}
             >
               Create Account

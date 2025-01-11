@@ -94,7 +94,7 @@ export default function Home() {
     switch (authState) {
       case "connect_wallet":
         return (
-          <Card className="w-full max-w-md mx-auto">
+          <Card className="w-full max-w-md mx-auto bg-white">
             <CardContent className="pt-6">
               <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-6">
@@ -111,7 +111,7 @@ export default function Home() {
                   />
                 </div>
                 <Button
-                  className="w-full"
+                  className="w-full bg-[#339D53] hover:bg-[#339D53]/90"
                   onClick={() => handleWalletConnect(walletId)}
                 >
                   Connect Wallet
@@ -123,13 +123,13 @@ export default function Home() {
 
       case "validate_nft":
         return (
-          <Card className="w-full max-w-md mx-auto">
+          <Card className="w-full max-w-md mx-auto bg-white">
             <CardContent className="pt-6">
               <div className="text-center py-8">
-                <Shield className="w-16 h-16 mx-auto mb-4 text-primary animate-pulse" />
+                <Shield className="w-16 h-16 mx-auto mb-4 text-[#339D53] animate-pulse" />
                 <p>Validating NFT holder status...</p>
                 <Button
-                  className="mt-6"
+                  className="mt-6 bg-[#339D53] hover:bg-[#339D53]/90"
                   onClick={handleNFTValidation}
                 >
                   Simulate Validation
@@ -168,7 +168,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8BB33]">
       <Navigation 
         currentStep={getStepTitle(authState)} 
         showSignOut={authState === "authenticated"}
