@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Wallet, Mail, Shield } from "lucide-react";
+import { Wallet, Mail, Shield, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ const steps = [
   { id: 1, title: "Connect Wallet", icon: Wallet },
   { id: 2, title: "Validate Holder", icon: Shield },
   { id: 3, title: "Create Account", icon: Mail },
+  { id: 4, title: "Verify Email", icon: CheckCircle },
 ];
 
 interface RegistrationStepperProps {
@@ -22,6 +23,7 @@ interface RegistrationStepperProps {
 export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
@@ -30,6 +32,20 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
       password: "",
     },
   });
+
+  useEffect(() => {
+    if (isVerifying) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_IN') {
+          onComplete(form.getValues() as RegistrationState);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [isVerifying, onComplete, form]);
 
   const handleNextStep = async (data: Partial<RegistrationState>) => {
     try {
@@ -54,7 +70,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           return;
         }
 
-        const { error } = await supabase.auth.signUp({
+        const { error, data: authData } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
         });
@@ -68,12 +84,22 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           return;
         }
 
+        if (authData.user?.identities?.length === 0) {
+          toast({
+            title: "Error",
+            description: "Email already registered",
+            variant: "destructive",
+          });
+          return;
+        }
+
         toast({
           title: "Success",
-          description: "Account created successfully",
+          description: "Account created! Please verify your email to continue.",
         });
 
-        onComplete(data as RegistrationState);
+        setIsVerifying(true);
+        setCurrentStep(4);
         return;
       }
 
@@ -136,6 +162,24 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
             </div>
           </div>
         );
+      case 4:
+        return (
+          <div className="text-center space-y-4">
+            <Mail className="w-16 h-16 mx-auto text-primary animate-pulse" />
+            <h3 className="text-lg font-semibold">Check Your Email</h3>
+            <p className="text-sm text-muted-foreground">
+              We've sent a verification link to {form.getValues("email")}. 
+              Please verify your email to access your dashboard.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => window.location.reload()}
+            >
+              I've verified my email
+            </Button>
+          </div>
+        );
       default:
         return null;
     }
@@ -168,14 +212,16 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         <div className="min-h-[200px] flex flex-col justify-between">
           {renderStepContent()}
 
-          <div className="mt-6 flex justify-end">
-            <Button
-              onClick={() => handleNextStep(form.getValues())}
-              disabled={isLoading}
-            >
-              {isLoading ? "Loading..." : currentStep === 3 ? "Create Account" : "Continue"}
-            </Button>
-          </div>
+          {currentStep < 4 && (
+            <div className="mt-6 flex justify-end">
+              <Button
+                onClick={() => handleNextStep(form.getValues())}
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : currentStep === 3 ? "Create Account" : "Continue"}
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
