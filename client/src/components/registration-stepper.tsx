@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 import type { RegistrationState } from "@/lib/types";
 
 const steps = [
@@ -21,6 +22,7 @@ interface RegistrationStepperProps {
 
 export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
@@ -31,37 +33,69 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   });
 
   const handleNextStep = async (data: Partial<RegistrationState>) => {
-    if (currentStep === 1 && !data.walletId) {
+    try {
+      setIsLoading(true);
+
+      if (currentStep === 1 && !data.walletId) {
+        toast({
+          title: "Error",
+          description: "Please enter a wallet ID",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (currentStep === 3 && data.email) {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: data.email,
+        });
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        toast({
+          title: "Success",
+          description: "Verification code sent to your email",
+        });
+      }
+
+      if (currentStep === 4 && data.verificationCode) {
+        const { error } = await supabase.auth.verifyOtp({
+          email: data.email!,
+          token: data.verificationCode,
+          type: 'email',
+        });
+
+        if (error) {
+          toast({
+            title: "Error",
+            description: "Invalid verification code",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        onComplete(data as RegistrationState);
+        return;
+      }
+
+      if (currentStep < 4) {
+        setCurrentStep((prev) => prev + 1);
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Please enter a wallet ID",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
-      return;
-    }
-
-    if (currentStep === 3 && !data.email) {
-      toast({
-        title: "Error",
-        description: "Please enter your email",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (currentStep === 4 && !data.verificationCode) {
-      toast({
-        title: "Error",
-        description: "Please enter verification code",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (currentStep < 4) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      onComplete(data as RegistrationState);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -106,6 +140,9 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
               placeholder="Enter verification code"
               {...form.register("verificationCode")}
             />
+            <p className="text-sm text-muted-foreground">
+              Please enter the verification code sent to your email
+            </p>
           </div>
         );
       default:
@@ -139,12 +176,13 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
 
         <div className="min-h-[200px] flex flex-col justify-between">
           {renderStepContent()}
-          
+
           <div className="mt-6 flex justify-end">
             <Button
               onClick={() => handleNextStep(form.getValues())}
+              disabled={isLoading}
             >
-              {currentStep === 4 ? "Complete" : "Continue"}
+              {isLoading ? "Loading..." : currentStep === 4 ? "Complete" : "Continue"}
             </Button>
           </div>
         </div>
