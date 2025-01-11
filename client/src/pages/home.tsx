@@ -13,6 +13,7 @@ import type { RegistrationState, UserData } from "@/lib/types";
 
 const mockUserData: UserData = {
   username: "User Name Example",
+  email: "",
   walletId: "",
   streakCount: 3,
   isEligible: true,

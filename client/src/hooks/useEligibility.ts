@@ -4,8 +4,12 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 interface EligibilityResponse {
+  id: number;
   user_email: string;
-  is_eligible: boolean;
+  eligible_date: string;
+  reason: string | null;
+  streak_count: number;
+  last_streak_date: string;
 }
 
 export function useEligibility(email: string) {
@@ -29,7 +33,7 @@ export function useEligibility(email: string) {
       }
 
       const data: EligibilityResponse[] = await response.json();
-      return data.length > 0 && data[0].is_eligible;
+      return data.length > 0; // User is eligible if they exist in the table
     },
     retry: false,
   });
