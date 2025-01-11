@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Wallet, Mail, Shield, CheckCircle2 } from "lucide-react";
+import { Wallet, Mail, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,7 @@ import type { RegistrationState } from "@/lib/types";
 const steps = [
   { id: 1, title: "Connect Wallet", icon: Wallet },
   { id: 2, title: "Validate Holder", icon: Shield },
-  { id: 3, title: "Enter Email", icon: Mail },
-  { id: 4, title: "Verify Email", icon: CheckCircle2 },
+  { id: 3, title: "Create Account", icon: Mail },
 ];
 
 interface RegistrationStepperProps {
@@ -23,13 +22,12 @@ interface RegistrationStepperProps {
 export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
       walletId: "",
       email: "",
-      verificationCode: "",
+      password: "",
     },
   });
 
@@ -46,12 +44,19 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         return;
       }
 
-      if (currentStep === 3 && data.email) {
-        const { error } = await supabase.auth.signInWithOtp({
+      if (currentStep === 3) {
+        if (!data.email || !data.password) {
+          toast({
+            title: "Error",
+            description: "Please fill in all fields",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error } = await supabase.auth.signUp({
           email: data.email,
-          options: {
-            shouldCreateUser: true,
-          },
+          password: data.password,
         });
 
         if (error) {
@@ -63,34 +68,16 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           return;
         }
 
-        setCodeSent(true);
         toast({
           title: "Success",
-          description: "Verification code sent to your email",
+          description: "Account created successfully",
         });
-      }
-
-      if (currentStep === 4 && data.verificationCode) {
-        const { error } = await supabase.auth.verifyOtp({
-          email: data.email!,
-          token: data.verificationCode,
-          type: 'email',
-        });
-
-        if (error) {
-          toast({
-            title: "Error",
-            description: "Invalid verification code",
-            variant: "destructive",
-          });
-          return;
-        }
 
         onComplete(data as RegistrationState);
         return;
       }
 
-      if (currentStep < 4) {
+      if (currentStep < 3) {
         setCurrentStep((prev) => prev + 1);
       }
     } catch (error) {
@@ -127,57 +114,26 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
       case 3:
         return (
           <div className="space-y-4">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              {...form.register("email")}
-            />
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="verificationCode">Verification Code</Label>
-            <Input
-              id="verificationCode"
-              placeholder="Enter the code from your email"
-              maxLength={6}
-              {...form.register("verificationCode")}
-            />
-            <p className="text-sm text-muted-foreground">
-              Please enter the verification code sent to {form.getValues("email")}
-            </p>
-            <Button
-              variant="link"
-              className="px-0"
-              onClick={async () => {
-                if (!form.getValues("email")) return;
-                setIsLoading(true);
-                const { error } = await supabase.auth.signInWithOtp({
-                  email: form.getValues("email"),
-                  options: {
-                    shouldCreateUser: true,
-                  },
-                });
-                setIsLoading(false);
-                if (error) {
-                  toast({
-                    title: "Error",
-                    description: error.message,
-                    variant: "destructive",
-                  });
-                } else {
-                  toast({
-                    title: "Success",
-                    description: "New verification code sent",
-                  });
-                }
-              }}
-            >
-              Resend code
-            </Button>
+            <div>
+              <Label htmlFor="email">Email Address</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                className="mt-1"
+                {...form.register("email")}
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a password"
+                className="mt-1"
+                {...form.register("password")}
+              />
+            </div>
           </div>
         );
       default:
@@ -217,7 +173,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
               onClick={() => handleNextStep(form.getValues())}
               disabled={isLoading}
             >
-              {isLoading ? "Loading..." : currentStep === 4 ? "Complete Registration" : "Continue"}
+              {isLoading ? "Loading..." : currentStep === 3 ? "Create Account" : "Continue"}
             </Button>
           </div>
         </div>

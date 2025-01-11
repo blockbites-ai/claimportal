@@ -11,5 +11,5 @@ export interface UserData {
 export interface RegistrationState {
   walletId: string;
   email: string;
-  verificationCode: string;
+  password: string;
 }
