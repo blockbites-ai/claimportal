@@ -46,6 +46,12 @@ export default function Home() {
   const [userData, setUserData] = useState(mockUserData);
   const { toast } = useToast();
 
+  const handleSignOut = () => {
+    setAuthState("connect_wallet");
+    setWalletId("");
+    setUserData(mockUserData);
+  };
+
   const handleWalletConnect = (id: string) => {
     if (!id) {
       toast({
@@ -161,7 +167,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation currentStep={getStepTitle(authState)} />
+      <Navigation 
+        currentStep={getStepTitle(authState)} 
+        showSignOut={authState === "authenticated"}
+        onSignOut={handleSignOut}
+      />
       <div className="p-6">
         {renderContent()}
       </div>
