@@ -1,16 +1,17 @@
 import {
   Card,
   CardContent,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   User,
-  Heart,
-  Camera,
-  CheckSquare,
-  Home,
-  ChefHat,
-  MessageSquare
+  Trophy,
+  Timer,
+  Coins,
+  Check,
+  Loader2,
 } from "lucide-react";
 import type { UserData } from "@/lib/types";
 import { useEligibility } from "@/hooks/useEligibility";
@@ -24,110 +25,109 @@ interface DashboardProps {
 export function Dashboard({ userData }: DashboardProps) {
   const { data: eligibilityData, isLoading: isCheckingEligibility } = useEligibility(userData.email);
 
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    return format(new Date(dateString), 'MMM d, yyyy');
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8BB33]">
-      {/* Header */}
-      <div className="p-4 flex justify-between items-center text-[#263238]">
-        <div className="flex items-center gap-2">
-          <span className="text-xl font-bold">Hello, {userData.username}</span>
-        </div>
-        <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
-          <span className="text-sm font-medium">Level 1/10</span>
-          <div className="px-2 py-0.5 bg-white rounded-full text-sm font-semibold">
-            {userData.balance}
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#F8BB33] p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Account Info */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <User className="w-4 h-4 inline-block mr-2" />
+                Account Info
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-lg font-semibold">{userData.email}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                {eligibilityData?.isEligible ? (
+                  <span>Member since {formatDate(eligibilityData.eligibleDate)}</span>
+                ) : (
+                  "Membership pending"
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Main Content */}
-      <div className="p-4 flex-1">
-        {/* Stats Card */}
-        <Card className="bg-[#339D53] text-white mb-6">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div>
-                <Heart className="w-6 h-6 mx-auto mb-1" />
-                <div className="font-bold">{eligibilityData?.streakCount || 5}/5</div>
-                <div className="text-xs">Lives</div>
+          {/* Streak Information */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <Trophy className="w-4 h-4 inline-block mr-2" />
+                Streak Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{eligibilityData?.streakCount || 0}</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Streaks maintained
               </div>
-              <div>
-                <Camera className="w-6 h-6 mx-auto mb-1" />
-                <div className="font-bold">0/4</div>
-                <div className="text-xs">Photos</div>
+              <div className="text-xs text-muted-foreground mt-2">
+                Last streak: {formatDate(eligibilityData?.lastStreakDate)}
               </div>
-              <div>
-                <CheckSquare className="w-6 h-6 mx-auto mb-1" />
-                <div className="font-bold">0/5</div>
-                <div className="text-xs">Task</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Streak Days */}
-        <Card className="mb-6 bg-white">
-          <CardContent className="pt-6">
-            <h3 className="font-bold mb-4 flex items-center gap-2 text-[#263238]">
-              <span>STREAK DAYS</span>
-              <div className="bg-[#F8BB33]/20 p-1 rounded-full">
-                <span className="text-[#F8BB33] font-semibold">0</span>
+          {/* Balance */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                <Coins className="w-4 h-4 inline-block mr-2" />
+                Balance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{userData.balance} tokens</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Available for use
               </div>
-            </h3>
-            <div className="flex justify-between mb-4">
-              {[1, 2, 3, 4, 5].map((day) => (
-                <div key={day} className={cn(
-                  "w-10 h-10 rounded-full border-2 flex items-center justify-center font-medium",
-                  day <= (eligibilityData?.streakCount || 0)
-                    ? "border-[#339D53] bg-[#339D53] text-white"
-                    : "border-gray-300 text-[#263238]"
-                )}>
-                  {day}
+            </CardContent>
+          </Card>
+
+          {/* Claim Status */}
+          <Card className={cn({
+            "bg-[#339D53]/10": eligibilityData?.isEligible,
+            "bg-muted": !eligibilityData?.isEligible && !isCheckingEligibility,
+          })}>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Claim Status</h3>
+                  <p className={cn(
+                    "text-sm",
+                    {
+                      "text-[#339D53]": eligibilityData?.isEligible,
+                      "text-muted-foreground": !eligibilityData?.isEligible || isCheckingEligibility,
+                    }
+                  )}>
+                    {isCheckingEligibility ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Checking eligibility...
+                      </span>
+                    ) : eligibilityData?.isEligible ? (
+                      "You are eligible to claim"
+                    ) : (
+                      "Not eligible for claiming"
+                    )}
+                  </p>
                 </div>
-              ))}
-            </div>
-            <div className="text-sm text-[#263238]">
-              Complete your daily streak
-              <ul className="mt-2 space-y-2">
-                <li className="flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 text-[#339D53]" />
-                  <span className="font-medium">Complete 1 section in Edubites</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <div className="w-4 h-4">•</div>
-                  <span className="font-medium">Upload 2 meals to Daily Snap</span>
-                </li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom Navigation */}
-      <div className="bg-white border-t p-4">
-        <div className="flex justify-between items-center max-w-md mx-auto">
-          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
-            <Home className="h-5 w-5" />
-            <span className="text-xs font-medium">Home</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
-            <ChefHat className="h-5 w-5" />
-            <span className="text-xs font-medium">Chef</span>
-          </Button>
-          <Button 
-            variant="default"
-            size="lg"
-            className="rounded-full bg-[#339D53] hover:bg-[#339D53]/90 -mt-8 text-white font-medium px-8"
-          >
-            Start!
-          </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
-            <User className="h-5 w-5" />
-            <span className="text-xs font-medium">Profile</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
-            <MessageSquare className="h-5 w-5" />
-            <span className="text-xs font-medium">Feedback</span>
-          </Button>
+                <Button
+                  disabled={!eligibilityData?.isEligible || userData.hasClaimed || isCheckingEligibility}
+                  className="min-w-[120px]"
+                  variant={eligibilityData?.isEligible ? "default" : "secondary"}
+                >
+                  <Check className="w-4 h-4 mr-2" />
+                  Claim
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
