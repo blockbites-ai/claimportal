@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
+import { LoginForm } from "@/components/login-form";
 import type { RegistrationState } from "@/lib/types";
 
 const steps = [
   { id: 1, title: "Connect Wallet", icon: Wallet },
   { id: 2, title: "Validate Holder", icon: Shield },
-  { id: 3, title: "Create Account", icon: Mail },
+  { id: 3, title: "Authentication", icon: Mail },
   { id: 4, title: "Verify Email", icon: CheckCircle },
 ];
 
@@ -24,6 +25,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
@@ -60,52 +62,73 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         return;
       }
 
-      if (currentStep === 3) {
-        if (!data.email || !data.password) {
-          toast({
-            title: "Error",
-            description: "Please fill in all fields",
-            variant: "destructive",
-          });
-          return;
-        }
+      if (currentStep === 2) {
+        // Simulate NFT validation
+        setCurrentStep(3);
+        return;
+      }
 
-        const { error, data: authData } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-        });
-
-        if (error) {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (authData.user?.identities?.length === 0) {
-          toast({
-            title: "Error",
-            description: "Email already registered",
-            variant: "destructive",
-          });
-          return;
-        }
-
+      if (currentStep === 3 && !authMode) {
         toast({
-          title: "Success",
-          description: "Account created! Please verify your email to continue.",
+          title: "Error",
+          description: "Please select an authentication method",
+          variant: "destructive",
         });
-
-        setIsVerifying(true);
-        setCurrentStep(4);
         return;
       }
 
       if (currentStep < 3) {
         setCurrentStep((prev) => prev + 1);
       }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLoginSuccess = (data: { email: string }) => {
+    form.setValue("email", data.email);
+    onComplete(form.getValues() as RegistrationState);
+  };
+
+  const handleRegistration = async (data: RegistrationState) => {
+    try {
+      setIsLoading(true);
+      const { error, data: authData } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (authData.user?.identities?.length === 0) {
+        toast({
+          title: "Error",
+          description: "Email already registered",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Account created! Please verify your email to continue.",
+      });
+
+      setIsVerifying(true);
+      setCurrentStep(4);
     } catch (error) {
       toast({
         title: "Error",
@@ -138,6 +161,37 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           </div>
         );
       case 3:
+        if (!authMode) {
+          return (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-center mb-6">Choose an Option</h3>
+              <Button
+                className="w-full mb-4"
+                onClick={() => setAuthMode('login')}
+              >
+                Sign In
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setAuthMode('register')}
+              >
+                Create Account
+              </Button>
+            </div>
+          );
+        }
+
+        if (authMode === 'login') {
+          return (
+            <LoginForm
+              onSuccess={handleLoginSuccess}
+              onRegister={() => setAuthMode('register')}
+              walletConnected
+            />
+          );
+        }
+
         return (
           <div className="space-y-4">
             <div>
@@ -160,6 +214,20 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                 {...form.register("password")}
               />
             </div>
+            <Button
+              className="w-full"
+              onClick={() => handleRegistration(form.getValues())}
+              disabled={isLoading}
+            >
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
+            <Button
+              variant="link"
+              className="w-full"
+              onClick={() => setAuthMode('login')}
+            >
+              Already have an account? Sign In
+            </Button>
           </div>
         );
       case 4:
@@ -218,7 +286,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
                 onClick={() => handleNextStep(form.getValues())}
                 disabled={isLoading}
               >
-                {isLoading ? "Loading..." : currentStep === 3 ? "Create Account" : "Continue"}
+                {isLoading ? "Loading..." : currentStep === 3 ? "Next" : "Continue"}
               </Button>
             </div>
           )}
