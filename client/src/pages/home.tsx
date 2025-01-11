@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { RegistrationStepper } from "@/components/registration-stepper";
 import { LoginForm } from "@/components/login-form";
 import { Dashboard } from "@/components/dashboard";
+import { Navigation } from "@/components/navigation";
 import type { RegistrationState, UserData } from "@/lib/types";
 
 const mockUserData: UserData = {
@@ -21,6 +22,23 @@ const mockUserData: UserData = {
 };
 
 type AuthState = "connect_wallet" | "validate_nft" | "login" | "register" | "authenticated";
+
+const getStepTitle = (state: AuthState): string => {
+  switch (state) {
+    case "connect_wallet":
+      return "Connect Wallet";
+    case "validate_nft":
+      return "Validate NFT";
+    case "login":
+      return "Sign In";
+    case "register":
+      return "Create Account";
+    case "authenticated":
+      return "Dashboard";
+    default:
+      return "";
+  }
+};
 
 export default function Home() {
   const [authState, setAuthState] = useState<AuthState>("connect_wallet");
@@ -42,7 +60,6 @@ export default function Home() {
   };
 
   const handleNFTValidation = () => {
-    // Simulate NFT validation
     setTimeout(() => {
       setAuthState("login");
     }, 1500);
@@ -143,8 +160,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      {renderContent()}
+    <div className="min-h-screen bg-background">
+      <Navigation currentStep={getStepTitle(authState)} />
+      <div className="p-6">
+        {renderContent()}
+      </div>
     </div>
   );
 }
