@@ -83,6 +83,7 @@ export default function Home() {
     setUserData((prev) => ({
       ...prev,
       username: data.email,
+      email: data.email,
       walletId,
     }));
     setAuthState("authenticated");

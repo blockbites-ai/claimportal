@@ -1,5 +1,6 @@
 export interface UserData {
   username: string;
+  email: string;
   walletId: string;
   streakCount: number;
   isEligible: boolean;

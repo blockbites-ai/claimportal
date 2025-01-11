@@ -12,14 +12,18 @@ import {
   Timer,
   Coins,
   User,
+  Loader2,
 } from "lucide-react";
 import type { UserData } from "@/lib/types";
+import { useEligibility } from "@/hooks/useEligibility";
 
 interface DashboardProps {
   userData: UserData;
 }
 
 export function Dashboard({ userData }: DashboardProps) {
+  const { data: isEligible, isLoading: isCheckingEligibility } = useEligibility(userData.email);
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -91,13 +95,20 @@ export function Dashboard({ userData }: DashboardProps) {
             <div>
               <h3 className="text-lg font-semibold">Claim Status</h3>
               <p className="text-sm text-muted-foreground">
-                {userData.isEligible
-                  ? "You are eligible to claim"
-                  : "Not eligible for claiming"}
+                {isCheckingEligibility ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Checking eligibility...
+                  </span>
+                ) : isEligible ? (
+                  "You are eligible to claim"
+                ) : (
+                  "Not eligible for claiming"
+                )}
               </p>
             </div>
             <Button
-              disabled={!userData.isEligible || userData.hasClaimed}
+              disabled={!isEligible || userData.hasClaimed || isCheckingEligibility}
               className="min-w-[120px]"
             >
               <Check className="w-4 h-4 mr-2" />
