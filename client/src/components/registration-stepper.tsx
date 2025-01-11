@@ -1,35 +1,33 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Wallet, Mail, Shield, CheckCircle } from "lucide-react";
+import { Mail, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { LoginForm } from "@/components/login-form";
 import type { RegistrationState } from "@/lib/types";
 
 const steps = [
-  { id: 1, title: "Connect Wallet", icon: Wallet },
-  { id: 2, title: "Validate Holder", icon: Shield },
-  { id: 3, title: "Authentication", icon: Mail },
-  { id: 4, title: "Verify Email", icon: CheckCircle },
+  { id: 1, title: "Create Account", icon: Mail },
+  { id: 2, title: "Verify Email", icon: CheckCircle },
 ];
 
 interface RegistrationStepperProps {
   onComplete: (data: RegistrationState) => void;
+  walletId: string;
+  onLogin: () => void;
 }
 
-export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
+export function RegistrationStepper({ onComplete, walletId, onLogin }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
-      walletId: "",
+      walletId,
       email: "",
       password: "",
     },
@@ -49,56 +47,19 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
     }
   }, [isVerifying, onComplete, form]);
 
-  const handleNextStep = async (data: Partial<RegistrationState>) => {
-    try {
-      setIsLoading(true);
-
-      if (currentStep === 1 && !data.walletId) {
-        toast({
-          title: "Error",
-          description: "Please enter a wallet ID",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (currentStep === 2) {
-        // Simulate NFT validation
-        setCurrentStep(3);
-        return;
-      }
-
-      if (currentStep === 3 && !authMode) {
-        toast({
-          title: "Error",
-          description: "Please select an authentication method",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (currentStep < 3) {
-        setCurrentStep((prev) => prev + 1);
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLoginSuccess = (data: { email: string }) => {
-    form.setValue("email", data.email);
-    onComplete(form.getValues() as RegistrationState);
-  };
-
   const handleRegistration = async (data: RegistrationState) => {
     try {
       setIsLoading(true);
+
+      if (!data.email || !data.password) {
+        toast({
+          title: "Error",
+          description: "Please fill in all fields",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error, data: authData } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -128,7 +89,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
       });
 
       setIsVerifying(true);
-      setCurrentStep(4);
+      setCurrentStep(2);
     } catch (error) {
       toast({
         title: "Error",
@@ -143,55 +104,6 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="walletId">Wallet ID</Label>
-            <Input
-              id="walletId"
-              placeholder="Enter your wallet ID"
-              {...form.register("walletId")}
-            />
-          </div>
-        );
-      case 2:
-        return (
-          <div className="text-center py-8">
-            <Shield className="w-16 h-16 mx-auto mb-4 text-primary animate-pulse" />
-            <p>Validating NFT holder status...</p>
-          </div>
-        );
-      case 3:
-        if (!authMode) {
-          return (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-center mb-6">Choose an Option</h3>
-              <Button
-                className="w-full mb-4"
-                onClick={() => setAuthMode('login')}
-              >
-                Sign In
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setAuthMode('register')}
-              >
-                Create Account
-              </Button>
-            </div>
-          );
-        }
-
-        if (authMode === 'login') {
-          return (
-            <LoginForm
-              onSuccess={handleLoginSuccess}
-              onRegister={() => setAuthMode('register')}
-              walletConnected
-            />
-          );
-        }
-
         return (
           <div className="space-y-4">
             <div>
@@ -224,13 +136,13 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
             <Button
               variant="link"
               className="w-full"
-              onClick={() => setAuthMode('login')}
+              onClick={onLogin}
             >
               Already have an account? Sign In
             </Button>
           </div>
         );
-      case 4:
+      case 2:
         return (
           <div className="text-center space-y-4">
             <Mail className="w-16 h-16 mx-auto text-primary animate-pulse" />
@@ -254,7 +166,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-md mx-auto">
       <CardContent className="pt-6">
         <div className="flex justify-between mb-8">
           {steps.map((step) => {
@@ -277,19 +189,8 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           })}
         </div>
 
-        <div className="min-h-[200px] flex flex-col justify-between">
+        <div className="min-h-[200px]">
           {renderStepContent()}
-
-          {currentStep < 4 && (
-            <div className="mt-6 flex justify-end">
-              <Button
-                onClick={() => handleNextStep(form.getValues())}
-                disabled={isLoading}
-              >
-                {isLoading ? "Loading..." : currentStep === 3 ? "Next" : "Continue"}
-              </Button>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

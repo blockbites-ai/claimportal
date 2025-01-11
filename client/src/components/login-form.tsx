@@ -10,7 +10,7 @@ import { supabase } from "@/lib/supabase";
 interface LoginFormProps {
   onSuccess: (userData: { email: string }) => void;
   onRegister: () => void;
-  walletConnected?: boolean;
+  walletId: string;
 }
 
 interface LoginFormData {
@@ -18,7 +18,7 @@ interface LoginFormData {
   password: string;
 }
 
-export function LoginForm({ onSuccess, onRegister, walletConnected }: LoginFormProps) {
+export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
   const [isResetting, setIsResetting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -181,16 +181,14 @@ export function LoginForm({ onSuccess, onRegister, walletConnected }: LoginFormP
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
-            {!walletConnected && (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={onRegister}
-              >
-                Create Account
-              </Button>
-            )}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={onRegister}
+            >
+              Create Account
+            </Button>
           </div>
         </form>
       </CardContent>
