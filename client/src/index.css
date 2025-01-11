@@ -1,10 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --brand-green: 51 157 83; /* #339D53 */
+    --brand-yellow: 248 187 51; /* #F8BB33 */
+    --brand-black: 38 50 56; /* #263238 */
+  }
+
   * {
     @apply border-border;
+  }
+
+  html {
+    font-family: 'Poppins', system-ui, sans-serif;
   }
 
   body {

@@ -25,15 +25,15 @@ export function Dashboard({ userData }: DashboardProps) {
   const { data: eligibilityData, isLoading: isCheckingEligibility } = useEligibility(userData.email);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FFB800]">
+    <div className="flex flex-col min-h-screen bg-[#F8BB33]">
       {/* Header */}
-      <div className="p-4 flex justify-between items-center">
+      <div className="p-4 flex justify-between items-center text-[#263238]">
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold">Hello, {userData.username}</span>
         </div>
-        <div className="flex items-center gap-2 bg-yellow-500/50 px-3 py-1 rounded-full">
+        <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
           <span className="text-sm font-medium">Level 1/10</span>
-          <div className="px-2 py-0.5 bg-yellow-400 rounded-full text-sm">
+          <div className="px-2 py-0.5 bg-white rounded-full text-sm font-semibold">
             {userData.balance}
           </div>
         </div>
@@ -42,7 +42,7 @@ export function Dashboard({ userData }: DashboardProps) {
       {/* Main Content */}
       <div className="p-4 flex-1">
         {/* Stats Card */}
-        <Card className="bg-green-500 text-white mb-6">
+        <Card className="bg-[#339D53] text-white mb-6">
           <CardContent className="pt-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -65,36 +65,36 @@ export function Dashboard({ userData }: DashboardProps) {
         </Card>
 
         {/* Streak Days */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-white">
           <CardContent className="pt-6">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
+            <h3 className="font-bold mb-4 flex items-center gap-2 text-[#263238]">
               <span>STREAK DAYS</span>
-              <div className="bg-orange-500/20 p-1 rounded-full">
-                <span className="text-orange-600">0</span>
+              <div className="bg-[#F8BB33]/20 p-1 rounded-full">
+                <span className="text-[#F8BB33] font-semibold">0</span>
               </div>
             </h3>
             <div className="flex justify-between mb-4">
               {[1, 2, 3, 4, 5].map((day) => (
                 <div key={day} className={cn(
-                  "w-10 h-10 rounded-full border-2 flex items-center justify-center",
+                  "w-10 h-10 rounded-full border-2 flex items-center justify-center font-medium",
                   day <= (eligibilityData?.streakCount || 0)
-                    ? "border-green-500 bg-green-500 text-white"
-                    : "border-gray-300"
+                    ? "border-[#339D53] bg-[#339D53] text-white"
+                    : "border-gray-300 text-[#263238]"
                 )}>
                   {day}
                 </div>
               ))}
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-[#263238]">
               Complete your daily streak
               <ul className="mt-2 space-y-2">
                 <li className="flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 text-green-500" />
-                  Complete 1 section in Edubites
+                  <CheckSquare className="w-4 h-4 text-[#339D53]" />
+                  <span className="font-medium">Complete 1 section in Edubites</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-4 h-4">•</div>
-                  Upload 2 meals to Daily Snap
+                  <span className="font-medium">Upload 2 meals to Daily Snap</span>
                 </li>
               </ul>
             </div>
@@ -105,28 +105,28 @@ export function Dashboard({ userData }: DashboardProps) {
       {/* Bottom Navigation */}
       <div className="bg-white border-t p-4">
         <div className="flex justify-between items-center max-w-md mx-auto">
-          <Button variant="ghost" size="sm" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
             <Home className="h-5 w-5" />
-            <span className="text-xs">Home</span>
+            <span className="text-xs font-medium">Home</span>
           </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
             <ChefHat className="h-5 w-5" />
-            <span className="text-xs">Chef</span>
+            <span className="text-xs font-medium">Chef</span>
           </Button>
           <Button 
             variant="default"
             size="lg"
-            className="rounded-full bg-green-500 hover:bg-green-600 -mt-8"
+            className="rounded-full bg-[#339D53] hover:bg-[#339D53]/90 -mt-8 text-white font-medium px-8"
           >
             Start!
           </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
             <User className="h-5 w-5" />
-            <span className="text-xs">Profile</span>
+            <span className="text-xs font-medium">Profile</span>
           </Button>
-          <Button variant="ghost" size="sm" className="flex flex-col items-center">
+          <Button variant="ghost" size="sm" className="flex flex-col items-center text-[#263238]">
             <MessageSquare className="h-5 w-5" />
-            <span className="text-xs">Feedback</span>
+            <span className="text-xs font-medium">Feedback</span>
           </Button>
         </div>
       </div>
