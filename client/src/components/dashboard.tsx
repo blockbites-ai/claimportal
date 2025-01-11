@@ -91,20 +91,26 @@ export function Dashboard({ userData }: DashboardProps) {
 
           {/* Claim Status */}
           <Card className={cn(
-            "bg-white",
+            "border-none",
             {
-              "bg-[#339D53]/10 border-[#339D53]/20": eligibilityData?.isEligible,
-              "bg-gray-100 border-gray-200": !eligibilityData?.isEligible && !isCheckingEligibility,
+              "bg-[#339D53]": eligibilityData?.isEligible,
+              "bg-gray-200": !eligibilityData?.isEligible && !isCheckingEligibility,
             }
           )}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold">Claim Status</h3>
+                  <h3 className={cn(
+                    "text-lg font-semibold",
+                    {
+                      "text-white": eligibilityData?.isEligible,
+                      "text-gray-700": !eligibilityData?.isEligible || isCheckingEligibility,
+                    }
+                  )}>Claim Status</h3>
                   <p className={cn(
                     "text-sm",
                     {
-                      "text-[#339D53] font-medium": eligibilityData?.isEligible,
+                      "text-white font-medium": eligibilityData?.isEligible,
                       "text-gray-500": !eligibilityData?.isEligible || isCheckingEligibility,
                     }
                   )}>
@@ -125,8 +131,8 @@ export function Dashboard({ userData }: DashboardProps) {
                   className={cn(
                     "min-w-[120px]",
                     eligibilityData?.isEligible 
-                      ? "bg-[#339D53] hover:bg-[#339D53]/90" 
-                      : "bg-gray-200 text-gray-500 cursor-not-allowed hover:bg-gray-200"
+                      ? "bg-white text-[#339D53] hover:bg-white/90" 
+                      : "bg-gray-100 text-gray-500 cursor-not-allowed hover:bg-gray-100"
                   )}
                 >
                   <Check className="w-4 h-4 mr-2" />

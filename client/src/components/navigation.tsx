@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import BlockbitesLogo from "@/images/Blockbites.svg";
 
 interface NavigationProps {
   currentStep: string;
@@ -39,7 +40,7 @@ export function Navigation({
                   "cursor-default text-lg font-semibold text-[#263238]",
                 )}
               >
-                Blockbites
+                <img src={BlockbitesLogo} alt="Blockbites" className="h-7" />
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
