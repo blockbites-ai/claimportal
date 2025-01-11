@@ -16,6 +16,7 @@ import {
 import type { UserData } from "@/lib/types";
 import { useEligibility } from "@/hooks/useEligibility";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface DashboardProps {
   userData: UserData;
@@ -32,39 +33,7 @@ export function Dashboard({ userData }: DashboardProps) {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <Trophy className="w-4 h-4 inline-block mr-2" />
-              Streak Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{eligibilityData?.streakCount || 0}</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Streaks maintained
-            </div>
-            <div className="text-xs text-muted-foreground mt-2">
-              Last streak: {formatDate(eligibilityData?.lastStreakDate)}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              <Coins className="w-4 h-4 inline-block mr-2" />
-              Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{userData.balance} tokens</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Available for use
-            </div>
-          </CardContent>
-        </Card>
-
+        {/* Account Info */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -84,6 +53,42 @@ export function Dashboard({ userData }: DashboardProps) {
           </CardContent>
         </Card>
 
+        {/* Streak Information */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <Trophy className="w-4 h-4 inline-block mr-2" />
+              Streak Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{eligibilityData?.streakCount || 0}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Streaks maintained
+            </div>
+            <div className="text-xs text-muted-foreground mt-2">
+              Last streak: {formatDate(eligibilityData?.lastStreakDate)}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Balance */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <Coins className="w-4 h-4 inline-block mr-2" />
+              Balance
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{userData.balance} tokens</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Available for use
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Next Claim */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -100,12 +105,25 @@ export function Dashboard({ userData }: DashboardProps) {
         </Card>
       </div>
 
-      <Card className="mt-6">
+      {/* Claim Status */}
+      <Card className={cn(
+        "mt-6",
+        {
+          "bg-green-50 dark:bg-green-950": eligibilityData?.isEligible,
+          "bg-muted": !eligibilityData?.isEligible && !isCheckingEligibility,
+        }
+      )}>
         <CardContent className="pt-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">Claim Status</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className={cn(
+                "text-sm",
+                {
+                  "text-green-600 dark:text-green-400": eligibilityData?.isEligible,
+                  "text-muted-foreground": !eligibilityData?.isEligible || isCheckingEligibility,
+                }
+              )}>
                 {isCheckingEligibility ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -121,6 +139,7 @@ export function Dashboard({ userData }: DashboardProps) {
             <Button
               disabled={!eligibilityData?.isEligible || userData.hasClaimed || isCheckingEligibility}
               className="min-w-[120px]"
+              variant={eligibilityData?.isEligible ? "default" : "secondary"}
             >
               <Check className="w-4 h-4 mr-2" />
               Claim
