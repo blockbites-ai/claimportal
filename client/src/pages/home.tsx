@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RegistrationStepper } from "@/components/registration-stepper";
+import { LoginForm } from "@/components/login-form";
 import { Dashboard } from "@/components/dashboard";
 import type { RegistrationState, UserData } from "@/lib/types";
 
@@ -13,8 +14,10 @@ const mockUserData: UserData = {
   nextClaimDays: 2,
 };
 
+type AuthState = "login" | "register" | "authenticated";
+
 export default function Home() {
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [authState, setAuthState] = useState<AuthState>("login");
   const [userData, setUserData] = useState(mockUserData);
 
   const handleRegistrationComplete = (data: RegistrationState) => {
@@ -22,16 +25,29 @@ export default function Home() {
       ...prev,
       walletId: data.walletId,
     }));
-    setIsRegistered(true);
+    setAuthState("authenticated");
+  };
+
+  const handleLoginSuccess = (data: { email: string }) => {
+    setUserData((prev) => ({
+      ...prev,
+      username: data.email,
+    }));
+    setAuthState("authenticated");
   };
 
   return (
     <div className="min-h-screen bg-background p-6">
-      {!isRegistered ? (
-        <RegistrationStepper onComplete={handleRegistrationComplete} />
-      ) : (
-        <Dashboard userData={userData} />
+      {authState === "login" && (
+        <LoginForm
+          onSuccess={handleLoginSuccess}
+          onRegister={() => setAuthState("register")}
+        />
       )}
+      {authState === "register" && (
+        <RegistrationStepper onComplete={handleRegistrationComplete} />
+      )}
+      {authState === "authenticated" && <Dashboard userData={userData} />}
     </div>
   );
 }
