@@ -31,11 +31,11 @@ export function Dashboard({ userData }: DashboardProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8BB33] p-6">
+    <div className="p-6">
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Account Info */}
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 <User className="w-4 h-4 inline-block mr-2" />
@@ -55,7 +55,7 @@ export function Dashboard({ userData }: DashboardProps) {
           </Card>
 
           {/* Streak Information */}
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 <Trophy className="w-4 h-4 inline-block mr-2" />
@@ -74,7 +74,7 @@ export function Dashboard({ userData }: DashboardProps) {
           </Card>
 
           {/* Balance */}
-          <Card>
+          <Card className="bg-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
                 <Coins className="w-4 h-4 inline-block mr-2" />
@@ -90,10 +90,13 @@ export function Dashboard({ userData }: DashboardProps) {
           </Card>
 
           {/* Claim Status */}
-          <Card className={cn({
-            "bg-[#339D53]/10": eligibilityData?.isEligible,
-            "bg-muted": !eligibilityData?.isEligible && !isCheckingEligibility,
-          })}>
+          <Card className={cn(
+            "bg-white",
+            {
+              "bg-[#339D53]/10 border-[#339D53]/20": eligibilityData?.isEligible,
+              "bg-gray-100 border-gray-200": !eligibilityData?.isEligible && !isCheckingEligibility,
+            }
+          )}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -101,8 +104,8 @@ export function Dashboard({ userData }: DashboardProps) {
                   <p className={cn(
                     "text-sm",
                     {
-                      "text-[#339D53]": eligibilityData?.isEligible,
-                      "text-muted-foreground": !eligibilityData?.isEligible || isCheckingEligibility,
+                      "text-[#339D53] font-medium": eligibilityData?.isEligible,
+                      "text-gray-500": !eligibilityData?.isEligible || isCheckingEligibility,
                     }
                   )}>
                     {isCheckingEligibility ? (
@@ -119,8 +122,12 @@ export function Dashboard({ userData }: DashboardProps) {
                 </div>
                 <Button
                   disabled={!eligibilityData?.isEligible || userData.hasClaimed || isCheckingEligibility}
-                  className="min-w-[120px]"
-                  variant={eligibilityData?.isEligible ? "default" : "secondary"}
+                  className={cn(
+                    "min-w-[120px]",
+                    eligibilityData?.isEligible 
+                      ? "bg-[#339D53] hover:bg-[#339D53]/90" 
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed hover:bg-gray-200"
+                  )}
                 >
                   <Check className="w-4 h-4 mr-2" />
                   Claim
