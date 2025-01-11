@@ -23,6 +23,7 @@ interface RegistrationStepperProps {
 export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
   const form = useForm<RegistrationState>({
     defaultValues: {
@@ -48,6 +49,9 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
       if (currentStep === 3 && data.email) {
         const { error } = await supabase.auth.signInWithOtp({
           email: data.email,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
         });
 
         if (error) {
@@ -59,28 +63,15 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
           return;
         }
 
+        setEmailSent(true);
         toast({
           title: "Success",
-          description: "Verification code sent to your email",
+          description: "Verification link sent to your email",
         });
       }
 
-      if (currentStep === 4 && data.verificationCode) {
-        const { error } = await supabase.auth.verifyOtp({
-          email: data.email!,
-          token: data.verificationCode,
-          type: 'email',
-        });
-
-        if (error) {
-          toast({
-            title: "Error",
-            description: "Invalid verification code",
-            variant: "destructive",
-          });
-          return;
-        }
-
+      if (currentStep === 4) {
+        // Skip verification code step since we're using magic links
         onComplete(data as RegistrationState);
         return;
       }
@@ -133,15 +124,14 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
         );
       case 4:
         return (
-          <div className="space-y-4">
-            <Label htmlFor="verificationCode">Verification Code</Label>
-            <Input
-              id="verificationCode"
-              placeholder="Enter verification code"
-              {...form.register("verificationCode")}
-            />
+          <div className="space-y-4 text-center">
+            <CheckCircle2 className="w-16 h-16 mx-auto text-primary" />
+            <h3 className="text-lg font-semibold">Check Your Email</h3>
             <p className="text-sm text-muted-foreground">
-              Please enter the verification code sent to your email
+              We've sent a verification link to your email address. Please click the link to complete your registration.
+            </p>
+            <p className="text-sm">
+              {form.getValues("email")}
             </p>
           </div>
         );
@@ -182,7 +172,7 @@ export function RegistrationStepper({ onComplete }: RegistrationStepperProps) {
               onClick={() => handleNextStep(form.getValues())}
               disabled={isLoading}
             >
-              {isLoading ? "Loading..." : currentStep === 4 ? "Complete" : "Continue"}
+              {isLoading ? "Loading..." : currentStep === 4 ? "Complete Registration" : "Continue"}
             </Button>
           </div>
         </div>
