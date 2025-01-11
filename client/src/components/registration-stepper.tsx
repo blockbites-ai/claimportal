@@ -107,27 +107,27 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-[#263238]">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="mt-1"
+                className="mt-1 bg-white"
                 {...form.register("email")}
               />
             </div>
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-[#263238]">Password</Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Create a password"
-                className="mt-1"
+                className="mt-1 bg-white"
                 {...form.register("password")}
               />
             </div>
             <Button
-              className="w-full"
+              className="w-full bg-[#339D53] hover:bg-[#339D53]/90"
               onClick={() => handleRegistration(form.getValues())}
               disabled={isLoading}
             >
@@ -135,7 +135,7 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
             </Button>
             <Button
               variant="link"
-              className="w-full"
+              className="w-full text-[#263238]"
               onClick={onLogin}
             >
               Already have an account? Sign In
@@ -145,15 +145,15 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
       case 2:
         return (
           <div className="text-center space-y-4">
-            <Mail className="w-16 h-16 mx-auto text-primary animate-pulse" />
-            <h3 className="text-lg font-semibold">Check Your Email</h3>
-            <p className="text-sm text-muted-foreground">
+            <Mail className="w-16 h-16 mx-auto text-[#339D53] animate-pulse" />
+            <h3 className="text-lg font-semibold text-[#263238]">Check Your Email</h3>
+            <p className="text-sm text-[#263238]/70">
               We've sent a verification link to {form.getValues("email")}. 
               Please verify your email to access your dashboard.
             </p>
             <Button
               variant="outline"
-              className="mt-4"
+              className="mt-4 bg-white hover:bg-white/90"
               onClick={() => window.location.reload()}
             >
               I've verified my email
@@ -166,7 +166,7 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-[#F8BB33]">
       <CardContent className="pt-6">
         <div className="flex justify-between mb-8">
           {steps.map((step) => {
@@ -176,9 +176,9 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
                 key={step.id}
                 className={`flex flex-col items-center ${
                   step.id === currentStep
-                    ? "text-primary"
+                    ? "text-[#339D53]"
                     : step.id < currentStep
-                    ? "text-green-500"
+                    ? "text-[#339D53]"
                     : "text-gray-400"
                 }`}
               >
@@ -190,7 +190,60 @@ export function RegistrationStepper({ onComplete, walletId, onLogin }: Registrat
         </div>
 
         <div className="min-h-[200px]">
-          {renderStepContent()}
+          {currentStep === 1 ? (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email" className="text-[#263238]">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  className="mt-1 bg-white"
+                  {...form.register("email")}
+                />
+              </div>
+              <div>
+                <Label htmlFor="password" className="text-[#263238]">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  className="mt-1 bg-white"
+                  {...form.register("password")}
+                />
+              </div>
+              <Button
+                className="w-full bg-[#339D53] hover:bg-[#339D53]/90"
+                onClick={() => handleRegistration(form.getValues())}
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
+              </Button>
+              <Button
+                variant="link"
+                className="w-full text-[#263238]"
+                onClick={onLogin}
+              >
+                Already have an account? Sign In
+              </Button>
+            </div>
+          ) : (
+            <div className="text-center space-y-4">
+              <Mail className="w-16 h-16 mx-auto text-[#339D53] animate-pulse" />
+              <h3 className="text-lg font-semibold text-[#263238]">Check Your Email</h3>
+              <p className="text-sm text-[#263238]/70">
+                We've sent a verification link to {form.getValues("email")}. 
+                Please verify your email to access your dashboard.
+              </p>
+              <Button
+                variant="outline"
+                className="mt-4 bg-white hover:bg-white/90"
+                onClick={() => window.location.reload()}
+              >
+                I've verified my email
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

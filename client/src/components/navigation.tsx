@@ -28,7 +28,7 @@ export function Navigation({
   };
 
   return (
-    <div className="border-b">
+    <div className="border-b bg-[#F8BB33]">
       <div className="flex h-16 items-center px-4">
         <NavigationMenu>
           <NavigationMenuList>
@@ -36,7 +36,7 @@ export function Navigation({
               <NavigationMenuLink
                 className={cn(
                   navigationMenuTriggerStyle(),
-                  "cursor-default text-lg font-semibold",
+                  "cursor-default text-lg font-semibold text-[#263238]",
                 )}
               >
                 Blockbites
@@ -46,7 +46,7 @@ export function Navigation({
         </NavigationMenu>
         {showSignOut && (
           <div className="ml-auto">
-            <Button variant="ghost" onClick={handleSignOut}>
+            <Button variant="ghost" onClick={handleSignOut} className="text-[#263238] hover:text-[#263238]/80">
               Sign Out
             </Button>
           </div>

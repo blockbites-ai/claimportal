@@ -103,23 +103,23 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
 
   if (isResetting) {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full max-w-md mx-auto bg-[#F8BB33]">
         <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold mb-4">Reset Password</h3>
+          <h3 className="text-lg font-semibold mb-4 text-[#263238]">Reset Password</h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="email">Email Address</Label>
+              <Label htmlFor="email" className="text-[#263238]">Email Address</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="mt-1"
+                className="mt-1 bg-white"
                 {...form.register("email")}
               />
             </div>
             <div className="pt-2 space-y-2">
               <Button
-                className="w-full"
+                className="w-full bg-[#339D53] hover:bg-[#339D53]/90"
                 onClick={handleResetPassword}
                 disabled={isLoading}
               >
@@ -128,7 +128,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full"
+                className="w-full bg-white hover:bg-white/90"
                 onClick={() => setIsResetting(false)}
                 disabled={isLoading}
               >
@@ -142,33 +142,33 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-[#F8BB33]">
       <CardContent className="pt-6">
         <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email" className="text-[#263238]">Email Address</Label>
             <Input
               id="email"
               type="email"
               placeholder="Enter your email"
-              className="mt-1"
+              className="mt-1 bg-white"
               {...form.register("email")}
             />
           </div>
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-[#263238]">Password</Label>
             <Input
               id="password"
               type="password"
               placeholder="Enter your password"
-              className="mt-1"
+              className="mt-1 bg-white"
               {...form.register("password")}
             />
           </div>
           <Button
             type="button"
             variant="link"
-            className="px-0"
+            className="px-0 text-[#263238]"
             onClick={() => setIsResetting(true)}
           >
             Forgot password?
@@ -176,7 +176,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
           <div className="pt-2 space-y-2">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-[#339D53] hover:bg-[#339D53]/90"
               disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign In"}
@@ -184,7 +184,7 @@ export function LoginForm({ onSuccess, onRegister, walletId }: LoginFormProps) {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full bg-white hover:bg-white/90"
               onClick={onRegister}
             >
               Create Account
