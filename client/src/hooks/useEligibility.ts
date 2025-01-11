@@ -12,11 +12,27 @@ interface EligibilityResponse {
   last_streak_date: string;
 }
 
+export interface EligibilityData {
+  isEligible: boolean;
+  eligibleDate: string | null;
+  reason: string | null;
+  streakCount: number;
+  lastStreakDate: string | null;
+}
+
 export function useEligibility(email: string) {
   return useQuery({
     queryKey: ['eligibility', email],
-    queryFn: async (): Promise<boolean> => {
-      if (!email) return false;
+    queryFn: async (): Promise<EligibilityData> => {
+      if (!email) {
+        return {
+          isEligible: false,
+          eligibleDate: null,
+          reason: null,
+          streakCount: 0,
+          lastStreakDate: null
+        };
+      }
 
       const response = await fetch(
         `${SUPABASE_URL}/rest/v1/eligible_users?user_email=eq.${encodeURIComponent(email)}`,
@@ -33,7 +49,25 @@ export function useEligibility(email: string) {
       }
 
       const data: EligibilityResponse[] = await response.json();
-      return data.length > 0; // User is eligible if they exist in the table
+
+      if (data.length === 0) {
+        return {
+          isEligible: false,
+          eligibleDate: null,
+          reason: null,
+          streakCount: 0,
+          lastStreakDate: null
+        };
+      }
+
+      const user = data[0];
+      return {
+        isEligible: true,
+        eligibleDate: user.eligible_date,
+        reason: user.reason,
+        streakCount: user.streak_count,
+        lastStreakDate: user.last_streak_date
+      };
     },
     retry: false,
   });

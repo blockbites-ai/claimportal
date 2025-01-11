@@ -6,23 +6,28 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-  Wallet,
+  User,
   Trophy,
-  Check,
   Timer,
   Coins,
-  User,
+  Check,
   Loader2,
 } from "lucide-react";
 import type { UserData } from "@/lib/types";
 import { useEligibility } from "@/hooks/useEligibility";
+import { format } from "date-fns";
 
 interface DashboardProps {
   userData: UserData;
 }
 
 export function Dashboard({ userData }: DashboardProps) {
-  const { data: isEligible, isLoading: isCheckingEligibility } = useEligibility(userData.email);
+  const { data: eligibilityData, isLoading: isCheckingEligibility } = useEligibility(userData.email);
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    return format(new Date(dateString), 'MMM d, yyyy');
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -30,31 +35,18 @@ export function Dashboard({ userData }: DashboardProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              <User className="w-4 h-4 inline-block mr-2" />
-              User Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{userData.username}</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              <Wallet className="w-4 h-4 inline-block mr-1" />
-              {userData.walletId}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
               <Trophy className="w-4 h-4 inline-block mr-2" />
-              Streak Count
+              Streak Information
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{userData.streakCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Current streak maintained
-            </p>
+            <div className="text-2xl font-bold">{eligibilityData?.streakCount || 0}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Streaks maintained
+            </div>
+            <div className="text-xs text-muted-foreground mt-2">
+              Last streak: {formatDate(eligibilityData?.lastStreakDate)}
+            </div>
           </CardContent>
         </Card>
 
@@ -69,6 +61,25 @@ export function Dashboard({ userData }: DashboardProps) {
             <div className="text-2xl font-bold">{userData.balance} tokens</div>
             <div className="text-xs text-muted-foreground mt-1">
               Available for use
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              <User className="w-4 h-4 inline-block mr-2" />
+              Account Info
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-semibold">{userData.email}</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {eligibilityData?.isEligible ? (
+                <span>Member since {formatDate(eligibilityData.eligibleDate)}</span>
+              ) : (
+                "Membership pending"
+              )}
             </div>
           </CardContent>
         </Card>
@@ -100,7 +111,7 @@ export function Dashboard({ userData }: DashboardProps) {
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Checking eligibility...
                   </span>
-                ) : isEligible ? (
+                ) : eligibilityData?.isEligible ? (
                   "You are eligible to claim"
                 ) : (
                   "Not eligible for claiming"
@@ -108,7 +119,7 @@ export function Dashboard({ userData }: DashboardProps) {
               </p>
             </div>
             <Button
-              disabled={!isEligible || userData.hasClaimed || isCheckingEligibility}
+              disabled={!eligibilityData?.isEligible || userData.hasClaimed || isCheckingEligibility}
               className="min-w-[120px]"
             >
               <Check className="w-4 h-4 mr-2" />
