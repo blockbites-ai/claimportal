@@ -23,3 +23,9 @@
     @apply font-sans antialiased bg-[#F8BB33] text-foreground min-h-screen;
   }
 }
+
+
+.logoimg
+{
+  max-width:100px;
+}
