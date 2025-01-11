@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Image } from "@/components/ui/image";
 import BlockbitesLogo from "@/images/Blockbites.svg";
 
 interface NavigationProps {
@@ -21,7 +22,14 @@ export function Navigation({
   return (
     <div className="bg-[#F8BB33]">
       <div className="flex h-16 items-center justify-between px-4">
-        <img src={BlockbitesLogo} alt="Blockbites" className="h-5" />
+        <div className="h-4 w-auto">
+          <img
+            src="/BlockbitesLogo.svg"
+            alt="Blockbites"
+            className="h-full w-auto"
+            style={{ filter: 'brightness(0) saturate(100%)' }}
+          />
+        </div>
         {showSignOut && (
           <Button 
             variant="ghost" 
