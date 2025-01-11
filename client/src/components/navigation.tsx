@@ -1,4 +1,10 @@
-import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -9,7 +15,11 @@ interface NavigationProps {
   onSignOut?: () => void;
 }
 
-export function Navigation({ currentStep, showSignOut, onSignOut }: NavigationProps) {
+export function Navigation({
+  currentStep,
+  showSignOut,
+  onSignOut,
+}: NavigationProps) {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     if (onSignOut) {
@@ -26,10 +36,10 @@ export function Navigation({ currentStep, showSignOut, onSignOut }: NavigationPr
               <NavigationMenuLink
                 className={cn(
                   navigationMenuTriggerStyle(),
-                  "cursor-default text-lg font-semibold"
+                  "cursor-default text-lg font-semibold",
                 )}
               >
-                NFT Auth Demo
+                Blockbites
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
