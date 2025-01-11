@@ -1,11 +1,4 @@
-import { useLocation } from "wouter";
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
+import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
 interface NavigationProps {
@@ -13,8 +6,6 @@ interface NavigationProps {
 }
 
 export function Navigation({ currentStep }: NavigationProps) {
-  const [location] = useLocation();
-
   return (
     <div className="border-b">
       <div className="flex h-16 items-center px-4">
